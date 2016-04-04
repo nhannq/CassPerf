@@ -1,10 +1,8 @@
 package uconn.cse.cassperf;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
-
 import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.Host;
+import com.datastax.driver.core.Metadata;
 import com.datastax.driver.core.Session;
 //import me.prettyprint.cassandra.model.ConfigurableConsistencyLevel;
 //import me.prettyprint.hector.api.Cluster;
@@ -12,12 +10,17 @@ import com.datastax.driver.core.Session;
 //import me.prettyprint.hector.api.Keyspace;
 //import me.prettyprint.hector.api.factory.HFactory;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
+
 public class CassPerfDatastaxBase {
 
 	protected static Cluster cassPerfCluster;
 	protected static Session cassPerfSession;
 	// protected static Keyspace computationalKeyspace;
 	protected static Properties properties;
+
 
 	protected static void initializeDatastaxLib() {
 		properties = new Properties();
@@ -46,6 +49,13 @@ public class CassPerfDatastaxBase {
 				.withPort(
 						Integer.parseInt(properties.getProperty("cql.port",
 								"9042"))).build();
+	     Metadata metadata = cassPerfCluster.getMetadata();
+	       System.out.printf("Connected to cluster: %s\n", 
+	             metadata.getClusterName());
+	       for ( Host host : metadata.getAllHosts() ) {
+	          System.out.printf("Datacenter: %s; Host: %s; Rack: %s\n",
+	             host.getDatacenter(), host.getAddress(), host.getRack());
+	       }
 		// cassPerfCluster = HFactory.getOrCreateCluster(
 		// properties.getProperty("cluster.name", "CassPerfCluster"),
 		// properties.getProperty("cluster.hosts", "127.0.0.1:9160"));

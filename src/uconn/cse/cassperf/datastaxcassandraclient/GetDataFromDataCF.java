@@ -24,7 +24,7 @@ public class GetDataFromDataCF extends GetRows {
      */
     public ResultSet execute(String metric, int uid, int Start, int End, boolean reserved, int count) {
         //Key, Column_Name, Column_Value
-    	String cqlCommand = "select * from Data where rowName=" + uid + " and columnName >= " + Start + " and columnName <= " + End + " limit 50000;";
+    	String cqlCommand = "select * from CassExp.Data where rowName=" + uid + " and columnName >= " + Start + " and columnName <= " + End + " limit 50000;";
 //    	System.out.println(cqlCommand);
     	return session.execute(cqlCommand);
 //        sliceQuery =

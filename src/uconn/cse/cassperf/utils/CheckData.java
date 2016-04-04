@@ -103,192 +103,10 @@ public class CheckData {
     }
   }
 
-  // to measure Cassandra replicating performance
-  public void checkDatafromCassandraHectorPerSecond(int uID, int noOfReplicas, int minute,
-      String lcheckfile, int rate, int delayTime, String logFileName) { 
-    Double sum = 0.0;
+  public void checkDatafromCassandraDatastax(int uID, int noOfReplicas, int minute,
+      String lcheckfile, int rate, int delayTime, String logFileName) {
     int noOfSamples = minute * rate * 60;
     System.out.println("noOfSamples " + noOfSamples);
-    minute += delayTime;
-    int second = minute * 60;
-    int[] samplesPerSecond = new int[second]; // stores the samples per
-    // minute based on the time
-    // stamp of the time when
-    // the client send message
-    // to server
-    int[] samplesPerSecondServerTime = new int[second]; // stores the
-    // samples per
-    // minute based on
-    // the time stamp of
-    // the time when
-    // Cassandra saves
-    // message
-    Arrays.fill(samplesPerSecond, 0);
-    Arrays.fill(samplesPerSecondServerTime, 0);
-
-    try {
-      uconn.cse.cassperf.hectorcassandraclient.GetDataFromDataCF iGFCF =
-          new uconn.cse.cassperf.hectorcassandraclient.GetDataFromDataCF();
-      int tsID = 0;
-      String startTime = ""; // get the time when
-      // sensor starts to put
-      // data to the backend
-      BufferedReader br = new BufferedReader(new FileReader(logFileName));
-      try {
-        String line = br.readLine();
-
-        while (line != null) {
-          if (line.contains("startTime")) {
-            startTime = line.split("-")[1];
-          }
-
-          line = br.readLine();
-        }
-      } finally {
-        br.close();
-      }
-
-      String[] parsedStartTime = startTime.split("\\s+");
-      System.out.println("Time client called server :" + parsedStartTime[0]);
-      System.out.println("Time client called server :" + parsedStartTime[1]);
-      int startMinute = Integer.parseInt(parsedStartTime[1].split(":")[1]);
-      String putTime;
-      int putMinute = 0;
-      int putSecond = 0;
-      String[] parsedPutTime;
-      QueryResult<ColumnSlice<Integer, Double>> result0 =
-          iGFCF.execute("Data", uID, 0, 10, false, 1);
-      // get the first column to get the 1st time stamp when Cassandra saves the data
-      ColumnSlice<Integer, Double> colslice0 = result0.get();
-      List<HColumn<Integer, Double>> dataColumns = colslice0.getColumns();
-      String firstPutTime =
-          new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date(
-              dataColumns.get(0).getClock() / 1000));
-      String[] parsedFirstPutTime = firstPutTime.split("\\s+");
-      // System.out.println(parsedPutTime[1]);
-      // putHour =
-      // Integer.parseInt(parsedPutTime[1].split(":")[0]);
-      int firstPutMinute = Integer.parseInt(parsedFirstPutTime[1].split(":")[1]);
-      System.out.println("Time Casssandra saves data : " + parsedFirstPutTime[0]);
-      System.out.println("Time Casssandra saves data : " + parsedFirstPutTime[1]);
-
-      System.out.println("startMinute " + startMinute);
-      System.out.println("firstPutMinute " + firstPutMinute);
-      int trackSecond = -1;
-      int savedPutSecond = Integer.MIN_VALUE;
-
-      // startMinute = startMinute - 60;
-      while (tsID < noOfSamples - rate + 1) {
-        // System.out.println("tsID " + tsID);
-        result0 = iGFCF.execute("Data", uID, tsID, tsID + rate - 1, false, rate);
-        // get data from raw data table
-        colslice0 = result0.get();
-        dataColumns = colslice0.getColumns();
-        if (dataColumns.size() > 0) {
-          sum += colslice0.getColumns().size() * 1.0;
-          // if (parsedStartTime[0].equals(parsedPutTime[0])) {
-          // //if
-          // the date of put time is similar to the date of start
-          // time
-          // System.out.println("Same day");
-          // }
-          // System.out.println(startTime);
-          for (int columnIdx = 0; columnIdx < rate; columnIdx++) {
-            putTime =
-                new java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new java.util.Date(
-                    dataColumns.get(columnIdx).getClock() / 1000));
-            parsedPutTime = putTime.split("\\s+");
-            System.out.println(dataColumns.get(columnIdx).getValue() + " at " + parsedPutTime[1]);
-            // putHour =
-            // Integer.parseInt(parsedPutTime[1].split(":")[0]);
-            putMinute = Integer.parseInt(parsedPutTime[1].split(":")[1]);
-            if (putMinute <= 5)
-              putMinute += 60;
-            putSecond = Integer.parseInt(parsedPutTime[1].split(":")[2]);
-            if (putSecond != savedPutSecond) {
-              trackSecond++;
-              savedPutSecond = putSecond;
-            }
-            samplesPerSecond[trackSecond]++;
-          }
-        }
-        tsID += rate;
-      }
-
-      // for (int i = 0; i < colslice0.getColumns().size(); i++) {
-      // sum += colslice0.getColumns().get(i).getValue();
-      // }
-      // Close the input stream
-      // colslice0.getColumns().get(0).getName();
-      // System.out.println("Last column");
-      // System.out.println(colslice0.getColumns().get(0).getName());
-      // System.out.println(colslice0.getColumns().get(0).getClock()/1000);
-      // String startTime = new
-      // java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new
-      // java.util.Date (colslice0.getColumns().get(0).getClock()/1000));
-      // System.out.println(startTime);
-      // String startHour = startTime.split("\\s+")[1];
-      // int startMinute = Integer.parseInt(startHour.split(":")[1]);
-      // //get the minute of the first column
-      // int startSecond = Integer.parseInt(startHour.split(":")[2]);
-      // //get the minute of the first column
-      // int count = 0;
-      // for (int i = 0; i < colslice0.getColumns().size(); i++) {
-      // String tempTime = new
-      // java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new
-      // java.util.Date (colslice0.getColumns().get(i).getClock()/1000));
-      // // System.out.println(tempTime);
-      // String tempHour = tempTime.split("\\s+")[1];
-      // int tempMinute = Integer.parseInt(tempHour.split(":")[1]); //get
-      // the minute of the first column
-      // int tempSecond = Integer.parseInt(tempHour.split(":")[2]); //get
-      // the minute of the first column
-      // if (tempMinute == startMinute & tempSecond >= startSecond )
-      // count++;
-      // if (tempMinute == (startMinute + 1)%60 & tempSecond <=
-      // startSecond)
-      // count++;
-      // }
-      // System.out.println(startHour);
-      // String endTime = new
-      // java.text.SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(new
-      // java.util.Date
-      // (colslice0.getColumns().get(colslice0.getColumns().size()-1).getClock()/1000));
-      // String endHour = endTime.split("\\s+")[1];
-      // System.out.println(colslice0.getColumns().get(colslice0.getColumns().size()-1).getClock()/1000);
-      // System.out.println(endTime);
-
-      System.out.println("Finish checking: " + tsID + " size " + sum + " / " + noOfSamples + " : "
-          + (sum / noOfSamples));
-      System.out.println("rate:\t" + rate);
-      System.out.println("drop:\t" + (noOfSamples - sum));
-      System.out.println("ratio:\t" + sum / noOfSamples);
-      int sumSamplesPerSecond = 0;
-      for (int secondIdx = 0; secondIdx < second; secondIdx++)
-        if (samplesPerSecond[secondIdx] > 0) {
-          System.out.println("samplesPerSecond second " + secondIdx + " :\t"
-              + samplesPerSecond[secondIdx]);
-          sumSamplesPerSecond += samplesPerSecond[secondIdx];
-        }
-      System.out.println("sumSamplePerSecond:\t" + sumSamplesPerSecond);
-    } catch (Exception e) {// Catch exception if any
-      System.out.println("Finish checking: sum " + sum + " / " + noOfSamples + " : "
-          + (sum / noOfSamples));
-      System.out.println("rate:" + rate);
-      System.out.println("drop:" + (noOfSamples - sum));
-      System.out.println("ratio:" + sum / noOfSamples);
-      for (int minuteIdx = 0; minuteIdx < minute; minuteIdx++)
-        System.out.println("samplesPerSecond second\t" + minuteIdx + " : "
-            + samplesPerSecond[minuteIdx]);
-      System.err.println("Error: " + e.getMessage());
-      e.printStackTrace();
-    }
-  }
-
-  public void checkDatafromCassandraDatastax(int uID, int noOfReplicas, int noOfSamples,
-      String lcheckfile, int rate, int delayTime, String logFileName) {
-    Double sum = 0.0;
-    int minute = noOfSamples / (rate * 60) + delayTime;
     int[] samplesPerMinute = new int[minute]; // stores the samples per
     // minute based on the time
     // stamp of the time when
@@ -301,10 +119,14 @@ public class CheckData {
     // the time when
     // Cassandra saves
     // message
+    int nbDroppedMessages = -1;
+    int nbPutMessages = 0;
     for (int minuteIdx = 0; minuteIdx < minute; minuteIdx++) {
       samplesPerMinute[minuteIdx] = 0;
       samplesPerMinuteServerTime[minuteIdx] = 0;
     }
+    int nbReadMessages = rate;
+    int nbRuns = noOfSamples / nbReadMessages + 1;
     try {
       int tsID = 0;
       uconn.cse.cassperf.datastaxcassandraclient.GetDataFromDataCF iGFCF =
@@ -327,38 +149,42 @@ public class CheckData {
       } finally {
         br.close();
       }
+      int count = 0;
       String[] parsedStartTime = startTime.split("\\s+");
       System.out.println("Time client called server :" + parsedStartTime[0]);
       System.out.println("Time client called server :" + parsedStartTime[1]);
-      ResultSet result0 = iGFCF.execute("Data", uID, 0, rate - 1, false, rate);
+      ResultSet result0 = iGFCF.execute("Data", uID, 0, nbReadMessages - 1, false, nbReadMessages);
       while (tsID < noOfSamples - rate + 1) {
-        result0 = iGFCF.execute("Data", uID, tsID, tsID + rate - 1, false, rate);
-        tsID += rate;
+        result0 = iGFCF.execute("CassExp.Data", uID, tsID, tsID + nbReadMessages - 1, false, nbReadMessages);
+        tsID += nbReadMessages;
         // sum += result0.all().size();
         // s =
         System.out.println("tsID " + tsID + " size " + result0.all().size());
-        sum += result0.all().size();
-     
+        nbPutMessages += result0.all().size();
+        count++;
+        if (count > nbRuns)
+          break;
         // System.out.println("size " + sum + " : " + s);
       }
       // }
+      nbDroppedMessages = noOfSamples - nbPutMessages;
 
-      System.out.println("Finish checking: " + tsID + " size " + sum + " / " + noOfSamples + " : "
-          + (sum / noOfSamples));
+      System.out.println("Finish checking: " + tsID + " size " + nbDroppedMessages + " / " + noOfSamples + " : "
+          + (nbDroppedMessages / noOfSamples));
       System.out.println("rate:" + rate);
-      System.out.println("drop:" + (noOfSamples - sum));
-      System.out.println("ratio:" + sum / noOfSamples);
+      System.out.println("drop:" + nbDroppedMessages);
+      System.out.println("ratio:" + nbDroppedMessages / noOfSamples);
       for (int minuteIdx = 0; minuteIdx < minute; minuteIdx++)
         System.out.println("minute " + minuteIdx + " : " + samplesPerMinute[minuteIdx]);
       for (int minuteIdx = 0; minuteIdx < minute; minuteIdx++)
         System.out.println("minuteServerTime " + minuteIdx + " : "
             + samplesPerMinuteServerTime[minuteIdx]);
     } catch (Exception e) {// Catch exception if any
-      System.out.println("Finish checking: sum " + sum + " / " + noOfSamples + " : "
-          + (sum / noOfSamples));
+      System.out.println("Finish checking: size " + nbDroppedMessages + " / " + noOfSamples + " : "
+          + (nbDroppedMessages / noOfSamples));
       System.out.println("rate:" + rate);
-      System.out.println("drop:" + (noOfSamples - sum));
-      System.out.println("ratio:" + sum / noOfSamples);
+      System.out.println("drop:" + nbDroppedMessages);
+      System.out.println("ratio:" + nbDroppedMessages / noOfSamples);
       for (int minuteIdx = 0; minuteIdx < minute; minuteIdx++)
         System.out.println("minute " + minuteIdx + " : " + samplesPerMinute[minuteIdx]);
       for (int minuteIdx = 0; minuteIdx < minute; minuteIdx++)

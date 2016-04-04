@@ -161,18 +161,19 @@ public class PutData {
     }
   }
 
-  public void generateDataforCassandraDatastax(int uID, int noOfReplicas, int noOfSamples, int rate) {
+  public void generateDataforCassandraDatastax(int uID, int noOfReplicas, int minute, int rate) {
     int tsID = 0;
     long executedTime = 0;
     String timeStampOutput = "";
     // String test = "";
+    int noOfSamples = minute * rate * 60;
     try {
       DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
       uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF iRFCF =
-          new uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF();
+          new uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF(rate);
       Double Value = 0.0;
 
-      int minute = noOfSamples / (rate * 60);
+
       // System.out.println(rate);
       // System.out.println(noOfSamples);
       // System.out.println(minute);
