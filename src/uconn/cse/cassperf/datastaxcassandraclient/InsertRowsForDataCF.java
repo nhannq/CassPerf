@@ -5,6 +5,7 @@ package uconn.cse.cassperf.datastaxcassandraclient;
 
 import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.PreparedStatement;
+import com.datastax.driver.core.ResultSet;
 
 import me.prettyprint.hector.api.query.QueryResult;
 
@@ -33,20 +34,21 @@ public class InsertRowsForDataCF extends InsertRows {
 
   // put data through a list
   // public QueryResult<?> execute2(int RowName, int tsID, int rate) {
-  public long executeMultiColumns(int rowName, int tsID, int rate) {
+  public void executeMultiColumns(int rowName, int tsID, int rate) {
     // Key
     // String cqlCommand = "BEGIN BATCH ";
     // CF name, CF value
-    int count = 0;
-    while (count < rate) {
+    int count = tsID;
+    while (count < tsID + rate) {
       BatchStatement bs = new BatchStatement();
       PreparedStatement ps =
           session.prepare("insert into CassExp.Data (rowName, columnName, v) VALUES (?,?,?)");
       for (int key = count; key < count + maxBatchStmts; key++) {
         bs.add(ps.bind(rowName, key, 1.0));
-      }
+      }      
       session.execute(bs);
       count += maxBatchStmts;
+//      System.out.println("count " + count);
     }
     // cqlCommand += "APPLY BATCH;";
     // session.execute(cqlCommand);
@@ -55,6 +57,5 @@ public class InsertRowsForDataCF extends InsertRows {
     // mutator.addInsertion(RowName, CFName, HFactory.createColumn(Key,
     // Value, LongSerializer.get(), LongSerializer.get()));
     // mutator.execute();
-    return 1;
   }
 }

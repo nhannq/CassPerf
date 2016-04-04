@@ -26,83 +26,6 @@ public class CheckData {
 
   private final Logger logger = LoggerFactory.getLogger(getClass());
 
-  // to measure Cassandra replicating performance
-  public void checkDatafromCassandraHector(int uID, int noOfReplicas, int minute,
-      String lcheckfile, int rate, int delayTime, String logFileName) {
-    long sysStartTime = System.currentTimeMillis();
-    int noOfSamples = minute * rate * 60;
-    System.out.println("noOfSamples " + noOfSamples);
-    minute += delayTime;
-    int nbDroppedMessages = -1;
-    int nbPutMessages = 0;
-
-    try {
-      uconn.cse.cassperf.hectorcassandraclient.GetDataFromDataCF iGFCF =
-          new uconn.cse.cassperf.hectorcassandraclient.GetDataFromDataCF();
-      int tsID = 0;
-      String startTime = "";
-      // sensor starts to put
-      // data to the backend
-      BufferedReader br = new BufferedReader(new FileReader(logFileName));
-      try {
-        String line = br.readLine();
-
-        while (line != null) {
-          if (line.contains("startTime")) {
-            startTime = line.split("-")[1];
-          }
-          line = br.readLine();
-        }
-      } finally {
-        br.close();
-      }
-
-      String[] parsedStartTime = startTime.split("\\s+");
-      System.out.println("Time client called server :" + parsedStartTime[0]);
-      System.out.println("Time client called server :" + parsedStartTime[1]);
-      QueryResult<ColumnSlice<Integer, Double>> result0;
-      // get the first column to get the 1st time stamp when Cassandra saves the data
-      ColumnSlice<Integer, Double> colslice0;
-      List<HColumn<Integer, Double>> dataColumns;
-      int nbReadMessages = rate;
-      int count = 0;
-      int nbRuns = noOfSamples / nbReadMessages + 1;
-      while (tsID < noOfSamples - rate + 1) {
-
-        result0 =
-            iGFCF.execute("Data", uID, tsID, tsID + nbReadMessages - 1, false, nbReadMessages);
-        // get data from raw data table
-        colslice0 = result0.get();
-        dataColumns = colslice0.getColumns();
-        System.out.println("tsID " + tsID + " size " + dataColumns.size());
-        nbPutMessages += dataColumns.size();
-        tsID += nbReadMessages;
-        count++;
-
-        if (count > nbRuns)
-          break;
-      }
-      nbDroppedMessages = noOfSamples - nbPutMessages;
-
-      System.out.println("Finish checking: " + uID + " size " + nbDroppedMessages + " / "
-          + noOfSamples + " : " + (nbDroppedMessages / noOfSamples));
-      System.out.println("rate:\t" + rate);
-      System.out.println("put:\t" + nbPutMessages);
-      System.out.println("drop:\t" + nbDroppedMessages);
-      System.out.println("ratio:\t" + nbDroppedMessages / noOfSamples);
-      System.out.println("Runtime:\t" + (System.currentTimeMillis() - sysStartTime) / 1000);
-    } catch (Exception e) {// Catch exception if any
-      System.out.println("Exception Finish checking: " + uID + " size " + nbDroppedMessages + " / "
-          + noOfSamples + " : " + (nbDroppedMessages / noOfSamples));
-      System.out.println("rate:\t" + rate);
-      System.out.println("put:\t" + nbPutMessages);
-      System.out.println("drop:\t" + nbDroppedMessages);
-      System.out.println("ratio:\t" + nbDroppedMessages / noOfSamples);
-      System.out.println("Runtime:\t" + (System.currentTimeMillis() - sysStartTime) / 1000);
-      e.printStackTrace();
-    }
-  }
-
   public void checkDatafromCassandraDatastax(int uID, int noOfReplicas, int minute,
       String lcheckfile, int rate, int delayTime, String logFileName) {
     int noOfSamples = minute * rate * 60;
@@ -150,17 +73,21 @@ public class CheckData {
         br.close();
       }
       int count = 0;
+      int size;
       String[] parsedStartTime = startTime.split("\\s+");
       System.out.println("Time client called server :" + parsedStartTime[0]);
       System.out.println("Time client called server :" + parsedStartTime[1]);
       ResultSet result0 = iGFCF.execute("Data", uID, 0, nbReadMessages - 1, false, nbReadMessages);
+      int LIMIT = nbReadMessages + 100;
       while (tsID < noOfSamples - rate + 1) {
-        result0 = iGFCF.execute("CassExp.Data", uID, tsID, tsID + nbReadMessages - 1, false, nbReadMessages);
+        result0 =
+            iGFCF.execute("CassExp.Data", uID, tsID, tsID + nbReadMessages - 1, false,
+                LIMIT);
         tsID += nbReadMessages;
-        // sum += result0.all().size();
-        // s =
-        System.out.println("tsID " + tsID + " size " + result0.all().size());
-        nbPutMessages += result0.all().size();
+        size = result0.all().size();
+        nbPutMessages += size;
+//        System.out.println("tsID " + tsID + " size " + size);
+//        System.out.println("nbPutMessages " + nbPutMessages);
         count++;
         if (count > nbRuns)
           break;
@@ -168,9 +95,9 @@ public class CheckData {
       }
       // }
       nbDroppedMessages = noOfSamples - nbPutMessages;
-
-      System.out.println("Finish checking: " + tsID + " size " + nbDroppedMessages + " / " + noOfSamples + " : "
-          + (nbDroppedMessages / noOfSamples));
+      System.out.println("nbPutMessages " + nbPutMessages);
+      System.out.println("Finish checking: " + tsID + " size " + nbDroppedMessages + " / "
+          + noOfSamples + " : " + (nbDroppedMessages / noOfSamples));
       System.out.println("rate:" + rate);
       System.out.println("drop:" + nbDroppedMessages);
       System.out.println("ratio:" + nbDroppedMessages / noOfSamples);

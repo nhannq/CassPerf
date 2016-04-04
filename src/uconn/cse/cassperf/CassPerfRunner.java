@@ -34,42 +34,7 @@ public class CassPerfRunner {
     }
     int driver = Integer.parseInt(properties.getProperty("driver", "0"));
     long startTime = System.currentTimeMillis();
-    if (driver == 1) { // use Hector library
-      System.out.println("Using the Hector library");
-      CassPerfHectorBase.initializeHectorLib();
-
-      int firstParameter = Integer.parseInt(args[0]);
-      String logFileName = args[1];
-
-      if (firstParameter == 0) { // put data
-        PutData rD = new PutData();
-        int noOfReplica = 0;
-        noOfReplica = Integer.parseInt(properties.getProperty("noOfReplica"));
-        int minute = 0;
-        minute = Integer.parseInt(properties.getProperty("minute"));
-        int rate = 0;
-        rate = Integer.parseInt(properties.getProperty("rate"));
-        printInfo(noOfReplica, minute, rate);
-        rD.generateDataforCassandraHector(id, noOfReplica, minute, rate);
-      } else { // check data
-        CheckData cD = new CheckData();
-        int noOfReplica = 0;
-        noOfReplica = Integer.parseInt(properties.getProperty("noOfReplica"));
-        int minute = 0;
-        minute = Integer.parseInt(properties.getProperty("minute"));
-        int rate = 0;
-        rate = Integer.parseInt(properties.getProperty("rate"));
-        int delayTime = 0;
-        delayTime = Integer.parseInt(properties.getProperty("delayTime"));
-        String lcheckfile = properties.getProperty("lcheck");
-        System.out.println("minute " + minute);
-        System.out.println("rate " + rate);
-        System.out.println("delayTime " + delayTime);
-        System.out.println("lcheck " + lcheckfile);
-        cD.checkDatafromCassandraHector(id, noOfReplica, minute, lcheckfile, rate, delayTime,
-            logFileName);
-      }
-    } else if (driver == 0) { // use Datastax library
+    if (driver == 0) { // use Datastax library
       System.out.println("Using Datastax Java Driver");
       CassPerfDatastaxBase.initializeDatastaxLib();
 
