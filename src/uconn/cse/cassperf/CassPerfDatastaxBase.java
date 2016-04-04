@@ -71,7 +71,7 @@ public class CassPerfDatastaxBase {
 		// healthCareKeyspace =
 		// HFactory.createKeyspace(properties.getProperty("healthcare.keyspace",
 		// "HealthCare"), hcSystemCluster, ccl);
-		cassPerfSession = cassPerfCluster.connect("CassExp");
+		cassPerfSession = cassPerfCluster.connect();
 		// cassPerfKeyspace = HFactory.createKeyspace("CassExp",
 		// cassPerfCluster,
 		// configConsistencyLevel);
