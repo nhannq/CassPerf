@@ -97,7 +97,7 @@ public class CheckData {
       nbDroppedMessages = noOfSamples - nbPutMessages;
       System.out.println("nbPutMessages " + nbPutMessages);
       System.out.println("Finish checking: " + tsID + " size " + nbDroppedMessages + " / "
-          + noOfSamples + " : " + (nbDroppedMessages / noOfSamples));
+          + noOfSamples + " : " + (nbDroppedMessages / noOfSamples*1.0));
       System.out.println("rate:" + rate);
       System.out.println("drop:" + nbDroppedMessages);
       System.out.println("ratio:" + nbDroppedMessages / noOfSamples);

@@ -17,16 +17,19 @@ import org.slf4j.LoggerFactory;
 public class PutData {
   private static Logger logger = LoggerFactory.getLogger(PutData.class);
 
-  public void generateDataforCassandraDatastax(int uID, int noOfReplicas, int minute, int rate) {
-    int tsID = 0;
+  public void generateDataforCassandraDatastax(int uID, int noOfReplicas, int minute, int rate,
+      int startTimeStamp, int timeStampInterval, int nbstreams, String consistencyLevel) {
+    int tsID = startTimeStamp;
     long executedTime = 0;
     String timeStampOutput = "";
     // String test = "";
-    int noOfSamples = minute * rate * 60;
+    int noOfSamples = minute * rate * 60 * nbstreams;
+    int newRate = nbstreams * rate;
     try {
       DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
       uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF iRFCF =
-          new uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF(rate);
+          new uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF(newRate,
+              timeStampInterval, consistencyLevel);
       Double Value = 0.0;
 
 
@@ -46,20 +49,20 @@ public class PutData {
         // sensor starts to put
         // data to the backend
         System.out.println("startTime-" + startTime);
-        while (tsID < noOfSamples - rate + 1) {
+        while (tsID < noOfSamples - newRate + 1) {
           long timeStart = System.currentTimeMillis();
           // for (int i = 0; i < rate; i++) {
           // iRFCF.executeOneColumn(uID, tsID);
           // tsID += 1;
           // }
-          iRFCF.executeMultiColumns(uID, tsID, rate);
-          tsID += rate;
-          timeStampOutput += "ID : " + tsID + "-" + dateFormat.format(new Date()) + "\n";
+          iRFCF.executeMultiColumns(uID, tsID);
+          tsID += newRate;
+//          timeStampOutput += "ID : " + tsID + "-" + dateFormat.format(new Date()) + "\n";
           if ((System.currentTimeMillis() - timeStart) < 1000)
             Thread.sleep(1000 - (System.currentTimeMillis() - timeStart));
 
           if ((System.currentTimeMillis() - firstStartTime) > minute * 60 * 1000) {
-            System.out.println(timeStampOutput);
+//            System.out.println("timeStampOutput " + timeStampOutput);
             System.out.println("Finish putting " + tsID + " " + noOfSamples + " " + rate + " in "
                 + executedTime + " microSec");
             System.out.println("rate:" + rate);

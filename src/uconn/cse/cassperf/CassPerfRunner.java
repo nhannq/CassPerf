@@ -49,7 +49,11 @@ public class CassPerfRunner {
         minute = Integer.parseInt(properties.getProperty("minute"));
         int rate = 0;
         rate = Integer.parseInt(properties.getProperty("rate"));
-        rD.generateDataforCassandraDatastax(id, noOfReplica, minute, rate);
+        int startTimeStamp = Integer.parseInt(properties.getProperty("startTimeStamp"));
+        int timeStampInterval = Integer.parseInt(properties.getProperty("timeStampInterval"));
+        int nbstreams = Integer.parseInt(properties.getProperty("nbstreams"));
+        String consistencyLevel = properties.getProperty("consistencyLevel");
+        rD.generateDataforCassandraDatastax(id, noOfReplica, minute, rate, startTimeStamp, timeStampInterval, nbstreams, consistencyLevel);
       } else { // check data
         CheckData cD = new CheckData();
         int noOfReplica = 0;
@@ -104,7 +108,7 @@ public class CassPerfRunner {
         cD.checkDatafromCassandraAstyanax(id, noOfReplica, minute, lcheckfile, rate, delayTime,
             logFileName);
       }
-      // CassPerfDatastaxBase.close();
+       CassPerfDatastaxBase.close();
     }
 
     System.out.println("RT: " + (System.currentTimeMillis() - startTime));
