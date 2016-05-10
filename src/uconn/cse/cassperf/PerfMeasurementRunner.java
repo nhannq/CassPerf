@@ -2,12 +2,21 @@ package uconn.cse.cassperf;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Properties;
 
 import uconn.cse.cassperf.utils.CheckData;
 import uconn.cse.cassperf.utils.PutData;
+import uconn.cse.cassperf.utils.PutDataNonStop;
 
-public class CassPerfRunner {
+
+
+/**
+ * 
+ * @author nhannguyen
+ * This class is used to call other functions to perform experiments in which we test how many message a Cassandra system can receive per second.
+ * We define the number of messages we want to put to Cassandra then run experiments to see how long does Cassandra take to store that amount of data. 
+ */
+public class PerfMeasurementRunner {
 
   static void printInfo(int noOfReplica, int minute, int rate) {
     System.out.println("noOfReplica " + noOfReplica);
@@ -42,11 +51,9 @@ public class CassPerfRunner {
       String logFileName = args[1];
 
       if (firstParameter == 0) { // put data
-        PutData rD = new PutData();
+        PutDataNonStop rD = new PutDataNonStop();
         int noOfReplica = 0;
         noOfReplica = Integer.parseInt(properties.getProperty("noOfReplica"));
-        int minute = 0;
-        minute = Integer.parseInt(properties.getProperty("minute"));
         int rate = 0;
         rate = Integer.parseInt(properties.getProperty("rate"));
         int startTimeStamp = Integer.parseInt(properties.getProperty("startTimeStamp"));
@@ -54,8 +61,9 @@ public class CassPerfRunner {
         int nbstreams = Integer.parseInt(properties.getProperty("nbstreams"));
         String consistencyLevel = properties.getProperty("consistencyLevel");
         int maxBatchStmts = Integer.parseInt(properties.getProperty("maxBatchStmts"));
-        rD.generateDataforCassandraDatastax(id, noOfReplica, minute, rate, startTimeStamp,
-            timeStampInterval, nbstreams, consistencyLevel, maxBatchStmts);
+        int noOfSamples = Integer.parseInt(properties.getProperty("noOfSamples"));
+        rD.generateDataforCassandraDatastax(id, noOfReplica, rate, startTimeStamp,
+            timeStampInterval, nbstreams, consistencyLevel, noOfSamples, maxBatchStmts);
       } else { // check data
         CheckData cD = new CheckData();
         int noOfReplica = 0;

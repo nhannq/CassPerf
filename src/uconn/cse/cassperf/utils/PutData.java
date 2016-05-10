@@ -18,7 +18,7 @@ public class PutData {
   private static Logger logger = LoggerFactory.getLogger(PutData.class);
 
   public void generateDataforCassandraDatastax(int uID, int noOfReplicas, int minute, int rate,
-      int startTimeStamp, int timeStampInterval, int nbstreams, String consistencyLevel) {
+      int startTimeStamp, int timeStampInterval, int nbstreams, String consistencyLevel, int maxBatchStmts) {
     int tsID = startTimeStamp;
     long executedTime = 0;
     String timeStampOutput = "";
@@ -29,7 +29,7 @@ public class PutData {
       DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
       uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF iRFCF =
           new uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF(newRate,
-              timeStampInterval, consistencyLevel);
+              timeStampInterval, consistencyLevel, maxBatchStmts);
       Double Value = 0.0;
 
 

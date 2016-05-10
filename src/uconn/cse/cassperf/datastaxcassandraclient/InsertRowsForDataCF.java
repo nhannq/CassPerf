@@ -20,9 +20,10 @@ public class InsertRowsForDataCF extends InsertRows {
   int timeStampInterval = 1;
   ConsistencyLevel consistencyLevel;
 
-  public InsertRowsForDataCF(int rate, int timeStampInterval, String consistencyLevelStr) {
+  public InsertRowsForDataCF(int rate, int timeStampInterval, String consistencyLevelStr, int maxBatchStmts) {
     this.rate = rate;
     this.timeStampInterval = timeStampInterval;
+    this.maxBatchStmts = maxBatchStmts;
     switch (consistencyLevelStr) {
       case "ALL":
         consistencyLevel = ConsistencyLevel.ALL;
