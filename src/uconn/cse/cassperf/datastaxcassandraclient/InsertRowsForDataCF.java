@@ -16,7 +16,7 @@ import me.prettyprint.hector.api.query.QueryResult;
  */
 public class InsertRowsForDataCF extends InsertRows {
   int rate = -1;
-  int maxBatchStmts = 65000;
+  int maxBatchStmts = 10000;
   int timeStampInterval = 1;
   ConsistencyLevel consistencyLevel;
 

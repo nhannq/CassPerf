@@ -1,10 +1,5 @@
 package uconn.cse.cassperf;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
-
-import com.datastax.driver.core.Session;
 import com.netflix.astyanax.AstyanaxContext;
 //import me.prettyprint.cassandra.model.ConfigurableConsistencyLevel;
 //import me.prettyprint.hector.api.Cluster;
@@ -15,10 +10,13 @@ import com.netflix.astyanax.Keyspace;
 import com.netflix.astyanax.connectionpool.NodeDiscoveryType;
 import com.netflix.astyanax.connectionpool.impl.ConnectionPoolConfigurationImpl;
 import com.netflix.astyanax.connectionpool.impl.ConnectionPoolType;
-import com.netflix.astyanax.connectionpool.impl.CountingConnectionPoolMonitor;
 import com.netflix.astyanax.impl.AstyanaxConfigurationImpl;
 import com.netflix.astyanax.model.ConsistencyLevel;
 import com.netflix.astyanax.thrift.ThriftFamilyFactory;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 
 public class CassPerfAstyanaxBase {
 
