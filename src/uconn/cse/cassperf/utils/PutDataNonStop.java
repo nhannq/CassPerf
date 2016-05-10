@@ -17,63 +17,34 @@ import org.slf4j.LoggerFactory;
 public class PutDataNonStop {
   private static Logger logger = LoggerFactory.getLogger(PutDataNonStop.class);
 
-  public void generateDataforCassandraDatastax(int uID, int noOfReplicas, int rate,
-      int startTimeStamp, int timeStampInterval, int nbstreams, String consistencyLevel, int noOfSamples, int maxBatchStmts) {
+  public void generateDataforCassandraDatastax(int uID, int noOfReplicas, int startTimeStamp,
+      int timeStampInterval, int nbstreams, String consistencyLevel, int noOfSamples,
+      int maxBatchStmts) {
     int tsID = startTimeStamp;
-    long executedTime = 0;
+
     String timeStampOutput = "";
     // String test = "";
-    int newRate = nbstreams * rate;
+
+    long startTime = System.currentTimeMillis();
     try {
-      DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
       uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF iRFCF =
-          new uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF(newRate,
+          new uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF(Integer.MAX_VALUE,
               timeStampInterval, consistencyLevel, maxBatchStmts);
-      Double Value = 0.0;
+      startTime = System.currentTimeMillis();
 
-
-      // System.out.println(rate);
-      // System.out.println(noOfSamples);
-      // System.out.println(minute);
-      long firstStartTime = System.currentTimeMillis();
-      // double[] values = new double[rate];
-      // for (int i = 0; i < rate; i++) {
-      // values[i] = 1;
-      // }
-
-      if (rate > 1000) {
-        // System.out.println("Here");
-        Date date = new Date();
-        String startTime = dateFormat.format(date); // get the time when
-        // sensor starts to put
-        // data to the backend
-        System.out.println("startTime-" + startTime);
-        while (tsID < noOfSamples - newRate + 1) {
-          long timeStart = System.currentTimeMillis();
-          // for (int i = 0; i < rate; i++) {
-          // iRFCF.executeOneColumn(uID, tsID);
-          // tsID += 1;
-          // }
-          iRFCF.executeMultiColumns(uID, tsID);
-          tsID += newRate;
-//          timeStampOutput += "ID : " + tsID + "-" + dateFormat.format(new Date()) + "\n";
-        }
+      while (tsID < noOfSamples) {
+        iRFCF.executeMultiColumnsNonStop(uID, tsID);
+        tsID += maxBatchStmts;
       }
+
       System.out.println(timeStampOutput);
-      System.out.println("Finish putting " + tsID + " " + noOfSamples + " " + rate + " in "
-          + executedTime + " microSec");
-      System.out.println("rate:" + rate);
-      System.out.println("drop:" + (noOfSamples - tsID));
-      System.out.println("ratio:" + tsID / noOfSamples);
+      System.out.println("Finish putting " + tsID + " " + noOfSamples + " in "
+          + (System.currentTimeMillis() - startTime) + " microSec");
     } catch (Exception e) {// Catch exception if any
       System.out.println(timeStampOutput);
-      System.out.println("Finish putting " + tsID + " " + noOfSamples + " " + rate + " in "
-          + executedTime + " microSec");
-      System.out.println("rate:" + rate);
-      System.out.println("drop:" + (noOfSamples - tsID));
-      System.out.println("ratio:" + tsID / noOfSamples);
-      System.err.println("Error: " + e.getMessage());
+      System.out.println("Finish putting " + tsID + " " + noOfSamples + " in "
+          + (System.currentTimeMillis() - startTime) + " microSec");
       e.printStackTrace();
     }
-  } 
+  }
 }

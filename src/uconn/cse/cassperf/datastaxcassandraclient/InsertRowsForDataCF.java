@@ -20,7 +20,8 @@ public class InsertRowsForDataCF extends InsertRows {
   int timeStampInterval = 1;
   ConsistencyLevel consistencyLevel;
 
-  public InsertRowsForDataCF(int rate, int timeStampInterval, String consistencyLevelStr, int maxBatchStmts) {
+  public InsertRowsForDataCF(int rate, int timeStampInterval, String consistencyLevelStr,
+      int maxBatchStmts) {
     this.rate = rate;
     this.timeStampInterval = timeStampInterval;
     this.maxBatchStmts = maxBatchStmts;
@@ -97,4 +98,18 @@ public class InsertRowsForDataCF extends InsertRows {
     // Value, LongSerializer.get(), LongSerializer.get()));
     // mutator.execute();
   }
+
+  public void executeMultiColumnsNonStop(int rowName, int tsID) {
+    BatchStatement bs = new BatchStatement();
+    bs.setConsistencyLevel(consistencyLevel);
+
+    PreparedStatement ps =
+        session.prepare("insert into CassExp.Data (rowName, columnName, v) VALUES (?,?,?)");
+    for (int key = tsID; key < tsID + maxBatchStmts; key += timeStampInterval) {
+      // System.out.println(key);
+      bs.add(ps.bind(rowName, key, 1.0));
+    }
+    session.execute(bs);
+  }
+
 }

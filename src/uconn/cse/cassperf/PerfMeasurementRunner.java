@@ -54,15 +54,13 @@ public class PerfMeasurementRunner {
         PutDataNonStop rD = new PutDataNonStop();
         int noOfReplica = 0;
         noOfReplica = Integer.parseInt(properties.getProperty("noOfReplica"));
-        int rate = 0;
-        rate = Integer.parseInt(properties.getProperty("rate"));
-        int startTimeStamp = Integer.parseInt(properties.getProperty("startTimeStamp"));
+         int startTimeStamp = Integer.parseInt(properties.getProperty("startTimeStamp"));
         int timeStampInterval = Integer.parseInt(properties.getProperty("timeStampInterval"));
         int nbstreams = Integer.parseInt(properties.getProperty("nbstreams"));
         String consistencyLevel = properties.getProperty("consistencyLevel");
         int maxBatchStmts = Integer.parseInt(properties.getProperty("maxBatchStmts"));
         int noOfSamples = Integer.parseInt(properties.getProperty("noOfSamples"));
-        rD.generateDataforCassandraDatastax(id, noOfReplica, rate, startTimeStamp,
+        rD.generateDataforCassandraDatastax(id, noOfReplica, startTimeStamp,
             timeStampInterval, nbstreams, consistencyLevel, noOfSamples, maxBatchStmts);
       } else { // check data
         CheckData cD = new CheckData();
