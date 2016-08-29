@@ -60,23 +60,23 @@ public class CheckData {
       String startTime = ""; // get the time when
       // sensor starts to put
       // data to the backend
-      BufferedReader br = new BufferedReader(new FileReader(logFileName));
-      try {
-        String line = br.readLine();
-        while (line != null) {
-          if (line.contains("startTime")) {
-            startTime = line.split("-")[1];
-          }
-          line = br.readLine();
-        }
-      } finally {
-        br.close();
-      }
+//      BufferedReader br = new BufferedReader(new FileReader(logFileName));
+//      try {
+//        String line = br.readLine();
+//        while (line != null) {
+//          if (line.contains("startTime")) {
+//            startTime = line.split("-")[1];
+//          }
+//          line = br.readLine();
+//        }
+//      } finally {
+//        br.close();
+//      }
       int count = 0;
       int size;
-      String[] parsedStartTime = startTime.split("\\s+");
-      System.out.println("Time client called server :" + parsedStartTime[0]);
-      System.out.println("Time client called server :" + parsedStartTime[1]);
+//      String[] parsedStartTime = startTime.split("\\s+");
+//      System.out.println("Time client called server :" + parsedStartTime[0]);
+//      System.out.println("Time client called server :" + parsedStartTime[1]);
       ResultSet result0 = iGFCF.execute("Data", uID, 0, nbReadMessages - 1, false, nbReadMessages);
       int LIMIT = nbReadMessages + 100;
       while (tsID < noOfSamples - rate + 1) {
