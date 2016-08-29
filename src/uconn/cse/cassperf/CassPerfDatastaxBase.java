@@ -37,7 +37,7 @@ public class CassPerfDatastaxBase {
 		// see also
 		// me.prettyprint.cassandra.model.ConfigurableConsistencyLevelPolicy[Test]
 		// for details
-
+		try {
 		cassPerfCluster = Cluster
 				.builder()
 				.addContactPoint(
@@ -75,6 +75,9 @@ public class CassPerfDatastaxBase {
 		// cassPerfKeyspace = HFactory.createKeyspace("CassExp",
 		// cassPerfCluster,
 		// configConsistencyLevel);
+		} catch (Exception e) {
+		  e.printStackTrace();
+		}
 
 	}
 

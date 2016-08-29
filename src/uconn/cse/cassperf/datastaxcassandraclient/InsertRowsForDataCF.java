@@ -70,23 +70,26 @@ public class InsertRowsForDataCF extends InsertRows {
   }
 
   // put data through a list
-  // public QueryResult<?> execute2(int RowName, int tsID, int rate) {
   public void executeMultiColumns(int rowName, int tsID) {
     // Key
     // String cqlCommand = "BEGIN BATCH ";
     // CF name, CF value
     int count = tsID;
-    while (count < tsID + rate) {
+    int batchSize = maxBatchStmts;
+    int newTSID = tsID + rate;
+    while (count < newTSID) {
       BatchStatement bs = new BatchStatement();
       bs.setConsistencyLevel(consistencyLevel);
-
+      if (count + maxBatchStmts > newTSID)
+        batchSize = tsID + rate - count;
       PreparedStatement ps =
           session.prepare("insert into CassExp.Data (rowName, columnName, v) VALUES (?,?,?)");
-      for (int key = count; key < count + maxBatchStmts; key += timeStampInterval) {
+      for (int key = count; key < count + batchSize; key += timeStampInterval) {
         // System.out.println(key);
         bs.add(ps.bind(rowName, key, 1.0));
       }
-      session.execute(bs);
+//      session.execute(bs); 
+      session.executeAsync(bs); //https://docs.datastax.com/en/drivers/java/2.0/com/datastax/driver/core/Session.html#executeAsync-com.datastax.driver.core.Statement-
       count += maxBatchStmts;
       // System.out.println("count " + count);
     }
