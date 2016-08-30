@@ -22,7 +22,6 @@ public class PutData {
     int tsID = startTimeStamp;
     long executedTime = 0;
     String timeStampOutput = "";
-    // String test = "";
     int noOfSamples = minute * rate * 60 * nbstreams;
     int newRate = nbstreams * rate;
     try {
@@ -32,18 +31,12 @@ public class PutData {
               timeStampInterval, consistencyLevel, maxBatchStmts);
       Double Value = 0.0;
 
-
       // System.out.println(rate);
       // System.out.println(noOfSamples);
       // System.out.println(minute);
       long firstStartTime = System.currentTimeMillis();
-      // double[] values = new double[rate];
-      // for (int i = 0; i < rate; i++) {
-      // values[i] = 1;
-      // }
 
       if (rate > 1000) {
-        // System.out.println("Here");
         Date date = new Date();
         String startTime = dateFormat.format(date); // get the time when
         // sensor starts to put
@@ -51,18 +44,14 @@ public class PutData {
         System.out.println("startTime-" + startTime);
         while (tsID < noOfSamples - newRate + 1) {
           long timeStart = System.currentTimeMillis();
-          // for (int i = 0; i < rate; i++) {
-          // iRFCF.executeOneColumn(uID, tsID);
-          // tsID += 1;
-          // }
           iRFCF.executeMultiColumns(uID, tsID);
           tsID += newRate;
-//          timeStampOutput += "ID : " + tsID + "-" + dateFormat.format(new Date()) + "\n";
-          if ((System.currentTimeMillis() - timeStart) < 1000)
-            Thread.sleep(1000 - (System.currentTimeMillis() - timeStart));
+          
+          //Comment the following lines to test the performance of using batch statements
+//          if ((System.currentTimeMillis() - timeStart) < 1000)
+//            Thread.sleep(1000 - (System.currentTimeMillis() - timeStart));
 
           if ((System.currentTimeMillis() - firstStartTime) > minute * 60 * 1000) {
-//            System.out.println("timeStampOutput " + timeStampOutput);
             System.out.println("Finish putting " + tsID + " " + noOfSamples + " " + rate + " in "
                 + executedTime + " microSec");
             System.out.println("rate:" + rate);
