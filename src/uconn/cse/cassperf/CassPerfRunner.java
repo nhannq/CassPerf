@@ -54,8 +54,9 @@ public class CassPerfRunner {
         int nbstreams = Integer.parseInt(properties.getProperty("nbstreams"));
         String consistencyLevel = properties.getProperty("consistencyLevel");
         int maxBatchStmts = Integer.parseInt(properties.getProperty("maxBatchStmts"));
+        int testCassBatchStmtPerf = Integer.parseInt(properties.getProperty("testCassBatchStmtPerf"));
         rD.generateDataforCassandraDatastax(id, noOfReplica, minute, rate, startTimeStamp,
-            timeStampInterval, nbstreams, consistencyLevel, maxBatchStmts);
+            timeStampInterval, nbstreams, consistencyLevel, maxBatchStmts, testCassBatchStmtPerf);
       } else { // check data
         CheckData cD = new CheckData();
         int noOfReplica = 0;
