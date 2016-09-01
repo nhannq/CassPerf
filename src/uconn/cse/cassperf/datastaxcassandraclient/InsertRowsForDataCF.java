@@ -83,26 +83,30 @@ public class InsertRowsForDataCF extends InsertRows {
     PreparedStatement ps;
     batchSize = rate % maxBatchStmts;
     // System.out.println("batch size " + batchSize);
-    for (int i = 0; i < nbLoops; i++) {
-      bs = new BatchStatement();
-      bs.setConsistencyLevel(consistencyLevel);
-      ps = session.prepare("insert into CassExp.Data (rowName, columnName, v) VALUES (?,?,?)");
-      for (int key = count; key < count + maxBatchStmts; key += timeStampInterval)
-        // System.out.println(key);
-        bs.add(ps.bind(rowName, key, 1.0));
-      session.execute(bs);
-      count += maxBatchStmts;
-      // System.out.println("Count " + count);
-    }
+    try {
+      for (int i = 0; i < nbLoops; i++) {
+        bs = new BatchStatement();
+        bs.setConsistencyLevel(consistencyLevel);
+        ps = session.prepare("insert into CassExp.Data (rowName, columnName, v) VALUES (?,?,?)");
+        for (int key = count; key < count + maxBatchStmts; key += timeStampInterval)
+          // System.out.println(key);
+          bs.add(ps.bind(rowName, key, 1.0));
+        session.execute(bs);
+        count += maxBatchStmts;
+        // System.out.println("Count " + count);
+      }
 
-    if (batchSize > 0) {
-      bs = new BatchStatement();
-      bs.setConsistencyLevel(consistencyLevel);
-      ps = session.prepare("insert into CassExp.Data (rowName, columnName, v) VALUES (?,?,?)");
-      for (int key = count; key < count + batchSize; key += timeStampInterval)
-        // System.out.println(key);
-        bs.add(ps.bind(rowName, key, 1.0));
-      session.execute(bs);
+      if (batchSize > 0) {
+        bs = new BatchStatement();
+        bs.setConsistencyLevel(consistencyLevel);
+        ps = session.prepare("insert into CassExp.Data (rowName, columnName, v) VALUES (?,?,?)");
+        for (int key = count; key < count + batchSize; key += timeStampInterval)
+          // System.out.println(key);
+          bs.add(ps.bind(rowName, key, 1.0));
+        session.execute(bs);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
     // session.executeAsync(bs);
     // //https://docs.datastax.com/en/drivers/java/2.0/com/datastax/driver/core/Session.html#executeAsync-com.datastax.driver.core.Statement-
