@@ -72,47 +72,7 @@ public class CassPerfRunner {
             logFileName);
       }
       CassPerfDatastaxBase.close();
-    } else {
-      System.out.println("Using Astyanax library");
-      CassPerfAstyanaxBase.initializeDatastaxLib();
-
-      int firstParameter = Integer.parseInt(args[0]);
-      String logFileName = args[1];
-
-      if (firstParameter == 0) { // put data
-        PutData rD = new PutData();
-        int noOfReplica = 0;
-        noOfReplica = Integer.parseInt(properties.getProperty("noOfReplica"));
-        int minute = 0;
-        minute = Integer.parseInt(properties.getProperty("minute"));
-        int rate = 0;
-        rate = Integer.parseInt(properties.getProperty("rate"));
-        rD.generateDataforCassandraAstyanax(id, noOfReplica, minute, rate);
-      } else if (firstParameter == -1) {
-        PutData rD = new PutData();
-        int noOfReplica = 0;
-        noOfReplica = Integer.parseInt(properties.getProperty("noOfReplica"));
-        int minute = 0;
-        minute = Integer.parseInt(properties.getProperty("minute"));
-        int rate = 0;
-        rate = Integer.parseInt(properties.getProperty("rate"));
-        rD.generateDataforCassandraAstyanaxOneClient(id, noOfReplica, minute, rate);
-      } else { // check data
-        CheckData cD = new CheckData();
-        int noOfReplica = 0;
-        noOfReplica = Integer.parseInt(properties.getProperty("noOfReplica"));
-        int minute = 0;
-        minute = Integer.parseInt(properties.getProperty("minute"));
-        int rate = 0;
-        rate = Integer.parseInt(properties.getProperty("rate"));
-        int delayTime = 0;
-        delayTime = Integer.parseInt(properties.getProperty("delayTime"));
-        String lcheckfile = properties.getProperty("lcheck");
-        cD.checkDatafromCassandraAstyanax(id, noOfReplica, minute, lcheckfile, rate, delayTime,
-            logFileName);
-      }
-      CassPerfDatastaxBase.close();
-    }
+    } 
 
     System.out.println("RT: " + (System.currentTimeMillis() - startTime));
   }
