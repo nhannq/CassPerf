@@ -26,25 +26,25 @@ public class PutDataNonStop {
     // String test = "";
 
     long startTime = System.currentTimeMillis();
-    try {
-      uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF iRFCF =
-          new uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF(Integer.MAX_VALUE,
-              timeStampInterval, consistencyLevel, maxBatchStmts);
-      startTime = System.currentTimeMillis();
-
-      while (tsID < noOfSamples) {
-        iRFCF.executeMultiColumnsNonStop(uID, tsID);
-        tsID += maxBatchStmts;
-      }
-
-      System.out.println(timeStampOutput);
-      System.out.println("Finish putting " + tsID + " " + noOfSamples + " in "
-          + (System.currentTimeMillis() - startTime) + " microSec");
-    } catch (Exception e) {// Catch exception if any
-      System.out.println(timeStampOutput);
-      System.out.println("Finish putting " + tsID + " " + noOfSamples + " in "
-          + (System.currentTimeMillis() - startTime) + " microSec");
-      e.printStackTrace();
-    }
+//    try {
+//      uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF iRFCF =
+//          new uconn.cse.cassperf.datastaxcassandraclient.InsertRowsForDataCF(Integer.MAX_VALUE,
+//              timeStampInterval, consistencyLevel, maxBatchStmts);
+//      startTime = System.currentTimeMillis();
+//
+//      while (tsID < noOfSamples) {
+//        iRFCF.executeMultiColumnsNonStop(uID, tsID);
+//        tsID += maxBatchStmts;
+//      }
+//
+//      System.out.println(timeStampOutput);
+//      System.out.println("Finish putting " + tsID + " " + noOfSamples + " in "
+//          + (System.currentTimeMillis() - startTime) + " microSec");
+//    } catch (Exception e) {// Catch exception if any
+//      System.out.println(timeStampOutput);
+//      System.out.println("Finish putting " + tsID + " " + noOfSamples + " in "
+//          + (System.currentTimeMillis() - startTime) + " microSec");
+//      e.printStackTrace();
+//    }
   }
 }

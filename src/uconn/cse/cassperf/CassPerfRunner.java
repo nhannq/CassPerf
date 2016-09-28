@@ -16,6 +16,7 @@ public class CassPerfRunner {
   }
 
   public static void main(String[] args) throws IOException, InterruptedException {
+		System.out.println(Integer.MAX_VALUE);
     if (args.length < 2) {
       System.out.println("Hi! Welcome to Cassandra peformance monitoring program:");
       System.out.println("0 0 to put benchmark data");
@@ -55,8 +56,10 @@ public class CassPerfRunner {
         String consistencyLevel = properties.getProperty("consistencyLevel");
         int maxBatchStmts = Integer.parseInt(properties.getProperty("maxBatchStmts"));
         int testCassBatchStmtPerf = Integer.parseInt(properties.getProperty("testCassBatchStmtPerf"));
+        int valueType = Integer.parseInt(properties.getProperty("valueType")); //0: double, 1: int, 2: text
+        int valueLength = Integer.parseInt(properties.getProperty("valueLength")); 
         rD.generateDataforCassandraDatastax(id, noOfReplica, minute, rate, startTimeStamp,
-            timeStampInterval, nbstreams, consistencyLevel, maxBatchStmts, testCassBatchStmtPerf);
+            timeStampInterval, nbstreams, consistencyLevel, maxBatchStmts, testCassBatchStmtPerf, valueType, valueLength);
       } else { // check data
         CheckData cD = new CheckData();
         int noOfReplica = 0;
